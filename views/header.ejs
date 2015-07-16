@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="ja">
+<% include head %>
+<body>
+<nav class="navbar navbar-default navbar-fixed-top">
+<div class="container">
+<div class="navbar-header">
+<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+<span class="icon-bar"></span>
+<span class="icon-bar"></span>
+<span class="icon-bar"></span>
+</button>
+<a class="navbar-brand" href="/">favcounter</a>
+</div>
+<div id="navbar" class="navbar-collapse collapse navbar-right">
+<ul class="nav navbar-nav">
+<% if (accounts && accounts.length > 0) { %>
+<li class="dropdown">
+<a class="dropdown-toggle" aria-expanded="false" aria-haspopup="true" role="button" data-toggle="dropdown" href="#">
+<span class="navbar-icon"><img src="<%= accounts[0].data.profile_image_url_https %>" /></span>
+<%= accounts[0].data.screen_name %>
+<span class="caret"></span>
+</a>
+<ul class="dropdown-menu">
+<li><a href="/login">アカウントを追加</a></li>
+<li><a href="/logout">ログアウト</a></li>
+</ul>
+</li>
+<% } else { %>
+<li><a href="/login">ログイン</a></li>
+<% } %>
+</ul>
+</div>
+</div>
+</nav>
+<div class="container">
+<div class="jumbotron">
+<h1>ふぁぼかうんたー</h1>

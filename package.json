@@ -1,0 +1,35 @@
+{
+  "name": "favcounter",
+  "version": "0.2.0",
+  "description": "Twitterのお気に入り登録数を数えるサービス",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "forever -w -c\"node --harmony\" index.js",
+    "stop": "forever stop index.js",
+    "restart": "forever restart index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/bgpat/favcounter"
+  },
+  "keywords": [
+    "fav",
+    "twitter"
+  ],
+  "author": "bgpat",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/bgpat/favcounter/issues"
+  },
+  "dependencies": {
+    "body-parser": "^1.13.1",
+    "connect-memcached": "^0.1.0",
+    "ejs": "^2.3.2",
+    "express": "^4.13.0",
+    "express-session": "^1.11.3",
+    "mysql": "^2.7.0",
+    "oauth": "^0.9.13",
+    "redis": "^0.12.1"
+  }
+}
