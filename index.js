@@ -104,6 +104,9 @@ app.get('/callback', (req, res, next) => {
             next();
           }).bind(this));
         } else {
+          if (this.uid == null) {
+            this.uid = req.session.uid;
+          }
           User(req.session.uid, ((err, user) => {
             user.addAccount(this, (err => {
               req.session.user = null;
