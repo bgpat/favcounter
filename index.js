@@ -57,7 +57,7 @@ app.get('*', (req, res, next) => {
 app.get('/', (req, res) => {
   // TODO
   res.render('index', {
-    data: JSON.stringify(req.session),
+    session: JSON.stringify(req.session),
     accounts: req.session.accounts
   });
 });
@@ -124,7 +124,7 @@ app.use('*', (err, req, res, next) => {
   console.error(err);
   res.status(err.status || 500);
   res.render('index', {
-    data: err.message,
+    session: err.message,
     accounts: req.session.accounts
   });
 });

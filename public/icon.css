@@ -1,7 +1,4 @@
-.navbar-icon {
-}
-
-.navbar-icon > img {
+.icon > img {
 	width: 24px;
 	height: 24px;
 	-webkit-border-radius: 12px;
