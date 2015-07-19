@@ -25,7 +25,9 @@ User.prototype.pull = function(cb) {
   cb = cb || function(){};
   db.hget('user', this.uid, ((err, user) => {
     if (err) { return cb(err); }
-    if(user != null) {
+    if(user == null) {
+      this.uid = null;
+    } else {
       this.constructor(JSON.parse(user));
     }
     cb(err);

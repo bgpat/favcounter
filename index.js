@@ -38,16 +38,23 @@ app.get('*', (req, res, next) => {
   if (sess.uid != null && sess.user == null) {
     return User(sess.uid, (err, user) => {
       if (err) { return next(err); }
-      sess.user = user;
+      sess.uid = user.uid;
+      sess.user = user.uid && user;
       next();
     });
+    sess.user = null;
   }
   next();
 }, (req, res, next) => {
   var sess = req.session;
-  if (sess.user != null && sess.accounts == null) {
+  if (sess.user == null) {
+    sess.accounts = null;
+  } else if (sess.accounts == null) {
     return User(sess.user).getAccounts((err, accounts) => {
-      if (err) { return next(err); }
+      if (err) {
+        sess.user = null;
+        return next();
+      }
       sess.accounts = accounts;
       next();
     });
@@ -123,37 +130,56 @@ app.get('/callback', (req, res, next) => {
 
 app.post('/update', (req, res, next) => {
   if (req.body && req.body.accounts != null) {
-    var accounts = req.body.accounts
+    var accounts = req.body.accounts;
     accounts = accounts.filter((a, i) => {
       return accounts.indexOf(a) === i;
     });
-    User(req.session.uid, (err, user) => {
+    return User(req.session.uid, (err, user) => {
       if (err) { return next(err); }
       if (accounts.every(a => ~user.accounts.indexOf(a))) {
         user.accounts = accounts;
         req.session.accounts = null;
         req.session.user = user;
-        user.push(err => {
+        return user.push(err => {
           if (err) { return next(err); }
           res.contentType('json');
-          return res.end(JSON.stringify(accounts));
+          res.end(JSON.stringify(accounts));
         });
       }
+      next(new Error('アカウント情報が不正です'));
     });
   }
+  next(new Error('アカウント情報が不正です'));
 });
 
-app.get('*', (req, res) => res.redirect('/'));
+app.post('/remove', (req, res, next) => {
+  if (req.body && req.body.id != null) {
+    var id = req.body.id;
+    return Account(id, (err, account) => {
+      if (err) { return next(err); }
+      account.remove(err => {
+        if (err) { return next(err); }
+        req.session.accounts = null;
+        req.session.user = null;
+        res.contentType('json');
+        res.end(JSON.stringify(account));
+      });
+    });
+  }
+  next(new Error('アカウント情報が不正です'));
+});
 
-/* error */
-app.use('*', (err, req, res, next) => {
-  console.error(err);
-  res.status(err.status || 500);
-  res.render('index', {
-    session: err.message,
-    accounts: req.session.accounts
+  app.get('*', (req, res) => res.redirect('/'));
+
+  /* error */
+  app.use('*', (err, req, res, next) => {
+    console.error(err.stack);
+    res.status(err.status || 500);
+    res.render('index', {
+      session: err.message,
+      accounts: req.session.accounts
+    });
   });
-});
 
-/* listen */
-app.listen(config.server.socket);
+  /* listen */
+  app.listen(config.server.socket);

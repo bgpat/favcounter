@@ -84,6 +84,24 @@ $(function(){
     }
   }
 
+/*
+  $('.account > td:first-child').on('mousedown', function(e){
+    var tr = $(this).parent();
+    var id = tr.data('id').toString();
+    console.log(tr);
+    if (confirm(id)) {
+      $.ajax({
+        type: 'POST',
+        url: '/remove',
+        data: JSON.stringify({id: id}),
+        contentType:'application/json'
+      });
+      tr.remove();
+      e.stopPropagation();
+    }
+  });
+*/
+
   $('tbody.draggable > tr')
   .on('mousedown', function(e){
     if (dragging == null) {

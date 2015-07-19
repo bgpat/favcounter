@@ -53,3 +53,18 @@ Account.prototype.push = function(cb) {
   }
   db.hset('account', this.id, JSON.stringify(this), cb);
 };
+
+Account.prototype.remove = function(cb) {
+  cb = cb || function(){};
+  var User = require('./user');
+  User(this.uid, ((err, user) => {
+    if (err) { return cb(err); }
+    user.removeAccount(this.id, (err => {
+      if (err) { return cb(err); }
+      db.hdel('account', this.id, (err, user) => {
+        if (err) { return cb(err); }
+        cb(err, user);
+      });
+    }).bind(this));
+  }).bind(this));
+};
