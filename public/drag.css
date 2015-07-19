@@ -2,10 +2,6 @@
 	max-width: 1000% !important;
 }
 
-.draggable {
-	/*position: relative;*/
-}
-
 .draggable-item, .dragging-ghost {
 	-moz-user-select: none;
 	-webkit-user-select: none;

@@ -18,6 +18,7 @@ var app = express();
 app.disable('x-powered-by');
 app.set('view engine', 'ejs');
 app.set('views', __dirname + '/views');
+app.use(bodyParser.json());
 app.use(expressSession({
   secret: config.server.session.secret,
   proxy: true,
@@ -118,6 +119,28 @@ app.get('/callback', (req, res, next) => {
       }).bind(account));
     });
   });
+});
+
+app.post('/update', (req, res, next) => {
+  if (req.body && req.body.accounts != null) {
+    var accounts = req.body.accounts
+    accounts = accounts.filter((a, i) => {
+      return accounts.indexOf(a) === i;
+    });
+    User(req.session.uid, (err, user) => {
+      if (err) { return next(err); }
+      if (accounts.every(a => ~user.accounts.indexOf(a))) {
+        user.accounts = accounts;
+        req.session.accounts = null;
+        req.session.user = user;
+        user.push(err => {
+          if (err) { return next(err); }
+          res.contentType('json');
+          return res.end(JSON.stringify(accounts));
+        });
+      }
+    });
+  }
 });
 
 app.get('*', (req, res) => res.redirect('/'));

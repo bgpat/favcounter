@@ -37,9 +37,24 @@ $(function(){
 
   function endDrag(e) {
     if (dragging) {
+      $('.dragging-ghost').remove();
+      var accounts = dragging.siblings().andSelf();
+      $.ajax({
+        type: 'POST',
+        url: '/update',
+        contentType: 'application/json',
+        dataType: 'json',
+        data: JSON.stringify({
+          accounts: accounts.toArray().map(function(e){
+            return $(e).data('id') + '';
+          })
+        }),
+        success: function(data){
+          //console.log(data);
+        }
+      });
       dragging.removeClass('dragging');
       dragging = null;
-      $('.dragging-ghost').remove();
     }
   }
 
