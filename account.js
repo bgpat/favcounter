@@ -21,7 +21,7 @@ var Account = function(arg, cb) {
   this.id = arg.id || this.data.id_str;
   this.uid = arg.uid;
   this.last = arg.last;
-  this.fav = arg.fav || [];
+  this.log = arg.log || [];
 };
 module.exports = Account;
 

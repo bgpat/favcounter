@@ -17,7 +17,7 @@ var User = function(arg, cb) {
   arg = arg || {};
   this.uid = arg.uid;
   this.accounts = arg.accounts || [];
-  this.config = arg.config;
+  this.config = arg.config || {};
 };
 module.exports = User;
 

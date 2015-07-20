@@ -5,7 +5,7 @@
 <nav class="navbar navbar-default navbar-fixed-top">
 <div class="container">
 <div class="navbar-header">
-<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
 <span class="icon-bar"></span>
 <span class="icon-bar"></span>
 <span class="icon-bar"></span>
@@ -14,16 +14,27 @@
 </div>
 <div id="navbar" class="navbar-collapse collapse navbar-right">
 <ul class="nav navbar-nav">
+<% var accounts = session.accounts; %>
 <% if (accounts && accounts.length > 0) { %>
 <li class="dropdown">
-<a class="dropdown-toggle" aria-expanded="false" aria-haspopup="true" role="button" data-toggle="dropdown" href="#">
+<a class="dropdown-toggle" role="button" data-toggle="dropdown" href="#">
 <span class="icon"><img src="<%= accounts[0].data.profile_image_url_https %>" /></span>
 <%= accounts[0].data.screen_name %>
 <span class="caret"></span>
 </a>
 <ul class="dropdown-menu">
-<li><a href="/login">アカウントを追加</a></li>
-<li><a href="/logout">ログアウト</a></li>
+<li><a href="/login">
+<span class="glyphicon glyphicon-plus"></span> 
+アカウントを追加
+</a></li>
+<li><a href="/reload">
+<span class="glyphicon glyphicon-refresh"></span>
+再読み込み
+</a></li>
+<li><a href="/logout">
+<span class="glyphicon glyphicon-off"></span>
+ログアウト
+</a></li>
 </ul>
 </li>
 <% } else { %>
@@ -34,4 +45,13 @@
 </div>
 </nav>
 <div class="container">
+<div class="page-header">
 <h1>ふぁぼかうんたー</h1>
+</div>
+<% if (error != null) { %>
+<div class="alert alert-danger" role="alert">
+<span class="glyphicon glyphicon-exclamation-sign"></span>
+<span class="sr-only">Error:</span>
+<%= error %>
+</div>
+<% } %>

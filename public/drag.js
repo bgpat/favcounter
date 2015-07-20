@@ -12,9 +12,11 @@ $(function(){
     var ghost = dragging.clone().appendTo(dragging.parents('tbody'));
     var left = dragging.position().left;
     $('td', ghost).each(function(i){
+      var td = $('td', dragging).eq(i);
       $(this).css({
         position: 'absolute',
-        left: $('td', dragging).eq(i).position().left - left
+        width: td.width(),
+        left: td.position().left - left
       });
     });
     ghost
@@ -77,10 +79,6 @@ $(function(){
       if (next != null && next < y) {
         dragging.next().after(dragging);
       }
-      dragging.siblings().andSelf().each(function(i, e){
-        $('td:eq(0)', e).text(i + 1);
-      });
-      $('td:eq(0)', ghost).text($('td:eq(0)', dragging).text());
     }
   }
 
@@ -102,15 +100,18 @@ $(function(){
   });
 */
 
-  $('tbody.draggable > tr')
+  $('tbody.draggable td.account-grip')
   .on('mousedown', function(e){
     if (dragging == null) {
+      e.currentTarget = e.currentTarget.parentNode;
+      e.offsetY = e.pageY - offsetTop(e.currentTarget);
       beginDrag(e);
     }
     e.preventDefault();
   })
   .on('touchstart', function(e){
     e.pageY = e.originalEvent.touches[0].pageY;
+    e.currentTarget = e.currentTarget.parentNode;
     e.offsetY = e.pageY - offsetTop(e.currentTarget);
     beginDrag(e);
   });

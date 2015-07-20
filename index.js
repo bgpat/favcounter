@@ -63,11 +63,16 @@ app.get('*', (req, res, next) => {
 });
 
 app.get('/', (req, res) => {
-  // TODO
   res.render('index', {
-    session: JSON.stringify(req.session),
-    accounts: req.session.accounts
+    error: null,
+    session: req.session
   });
+});
+
+app.get('/reload', (req, res, next) => {
+  req.session.user = null;
+  req.session.accounts = null;
+  next();
 });
 
 app.get('/login', (req, res) => {
@@ -136,7 +141,8 @@ app.post('/update', (req, res, next) => {
     });
     return User(req.session.uid, (err, user) => {
       if (err) { return next(err); }
-      if (accounts.every(a => ~user.accounts.indexOf(a))) {
+      if (accounts.length === user.accounts.length && 
+        accounts.every(a => ~user.accounts.indexOf(a))) {
         user.accounts = accounts;
         req.session.accounts = null;
         req.session.user = user;
@@ -176,8 +182,8 @@ app.post('/remove', (req, res, next) => {
     console.error(err.stack);
     res.status(err.status || 500);
     res.render('index', {
-      session: err.message,
-      accounts: req.session.accounts
+      error: err.message,
+      session: req.session
     });
   });
 
