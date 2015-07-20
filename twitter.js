@@ -1,5 +1,5 @@
 var OAuth = new require('oauth')
-var config = require('./config');
+var config = require('./config.json');
 
 var oauth = new OAuth.OAuth(
   config.oauth.urls.request,

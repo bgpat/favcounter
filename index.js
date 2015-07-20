@@ -11,7 +11,7 @@ var MemcachedStore = require('connect-memcached')(expressSession);
 var Twitter = require('./twitter');
 var Account = require('./account');
 var User = require('./user');
-var config = require('./config');
+var config = require('./config.json');
 
 /* config */
 var app = express();
