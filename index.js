@@ -11,14 +11,17 @@ var MemcachedStore = require('connect-memcached')(expressSession);
 var Twitter = require('./twitter');
 var Account = require('./account');
 var User = require('./user');
-var config = require('./config.json');
+var config = require('./config');
 
 /* config */
 var app = express();
 app.disable('x-powered-by');
 app.set('view engine', 'ejs');
 app.set('views', __dirname + '/views');
+app.use(express.static(__dirname + '/public'));
 app.use(bodyParser.json());
+
+/* session */
 app.use(expressSession({
   secret: config.server.session.secret,
   proxy: true,
@@ -27,10 +30,7 @@ app.use(expressSession({
   key: config.server.session.key,
   store: new MemcachedStore({hosts: config.memcached.hosts})
 }));
-app.use(express.static(__dirname + '/public'));
-
-/* routing */
-app.get('*', (req, res, next) => {
+app.all('*', (req, res, next) => {
   var sess = req.session;
   if (sess.secret == null) {
     sess.secret = {};
@@ -40,6 +40,7 @@ app.get('*', (req, res, next) => {
       if (err) { return next(err); }
       sess.uid = user.uid;
       sess.user = user.uid && user;
+      sess.accounts = null;
       next();
     });
     sess.user = null;
@@ -62,6 +63,7 @@ app.get('*', (req, res, next) => {
   next();
 });
 
+/* routing */
 app.get('/', (req, res) => {
   res.render('index', {
     error: null,
