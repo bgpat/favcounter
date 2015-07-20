@@ -1,5 +1,3 @@
 .*.swp
 .*.swo
 node_modules
-config.js
-favcounter.sh
