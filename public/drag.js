@@ -82,8 +82,8 @@ $(function(){
     }
   }
 
-/*
-  $('.account > td:first-child').on('mousedown', function(e){
+
+  $('.account.dummy').on('mousedown', function(e){
     var tr = $(this).parent();
     var id = tr.data('id').toString();
     console.log(tr);
@@ -98,7 +98,21 @@ $(function(){
       e.stopPropagation();
     }
   });
-*/
+
+
+  $('.config-table :input').on('change keypress', function(e){
+    $.ajax({
+      type: 'POST',
+      url: '/config',
+      data: JSON.stringify({
+        tweet: $('#config-tweet').val(),
+        rank: $('#config-rank').val(),
+        format: $('#config-format').val()
+      }),
+      contentType: 'application/json',
+      dataType: 'json'
+    });
+  });
 
   $('tbody.draggable td.account-grip')
   .on('mousedown', function(e){

@@ -178,6 +178,25 @@ app.post('/remove', (req, res, next) => {
   next(new Error('アカウント情報が不正です'));
 });
 
+app.post('/config', (req, res, next) => {
+  if (typeof req.body !== 'object') {
+    return next(new Error('設定情報が不正です'));
+  }
+  User(req.session.uid, (err, user) => {
+    user.config = {
+      format: req.body.format || config.user.format,
+      tweet: req.body.tweet || true,
+      rank: req.body || true
+    };
+    req.session.user = user;
+    user.push(err => {
+      if (err) { return next(err); }
+      res.contentType('json');
+      res.end(JSON.stringify(user));
+    });
+  });
+});
+
 app.get('*', (req, res) => res.redirect('/'));
 
 /* error */

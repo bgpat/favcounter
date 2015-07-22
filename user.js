@@ -1,6 +1,7 @@
 'use strict';
 
 var db = require('./db');
+var config = require('./config');
 
 var User = function(arg, cb) {
   cb = cb || function(){};
@@ -18,7 +19,7 @@ var User = function(arg, cb) {
   this.uid = arg.uid;
   this.accounts = arg.accounts || [];
   this.config = arg.config || {
-    format: '',
+    format: config.user.format,
     rank: true,
     tweet: true
   };
