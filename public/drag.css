@@ -35,3 +35,18 @@ th, td {
 	-webkit-user-select: none;
 	user-select: none;
 }
+
+.config-table th {
+	padding-right: 20px !important;
+	text-align: right;
+	vertical-align: middle !important;
+}
+
+.config-table td {
+	padding-left: 20px !important;
+	text-align: left;
+}
+
+.config-format {
+	width: 100%;
+}

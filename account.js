@@ -17,11 +17,9 @@ var Account = function(arg, cb) {
   arg = arg || {};
   this.token = arg.token;
   this.secret = arg.secret;
-  this.data = arg.data || {};
-  this.id = arg.id || this.data.id_str;
+  this.id = arg.id;
+  this.data = arg.data || [];
   this.uid = arg.uid;
-  this.last = arg.last;
-  this.log = arg.log || [];
 };
 module.exports = Account;
 
@@ -67,4 +65,14 @@ Account.prototype.remove = function(cb) {
       });
     }).bind(this));
   }).bind(this));
+};
+
+Account.prototype.addData = function(data) {
+  data.timestamp = Date.now();
+  /* 新しいデータは前から */
+  if (this.data == null) {
+    this.data = [];
+  }
+  this.data.unshift(data);
+  /* this.data = this.data.slice(0, config.account.dataLength); */
 };

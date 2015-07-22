@@ -43,7 +43,7 @@ $(function(){
       var accounts = dragging.siblings().andSelf();
       $.ajax({
         type: 'POST',
-        url: '/update',
+        url: '/sort',
         contentType: 'application/json',
         dataType: 'json',
         data: JSON.stringify({

@@ -17,7 +17,11 @@ var User = function(arg, cb) {
   arg = arg || {};
   this.uid = arg.uid;
   this.accounts = arg.accounts || [];
-  this.config = arg.config || {};
+  this.config = arg.config || {
+    format: '',
+    rank: true,
+    tweet: true
+  };
 };
 module.exports = User;
 
@@ -96,4 +100,11 @@ User.prototype.removeAccount = function(id, cb) {
     db.hdel('user', this.uid, cb);
     this.uid = null;
   }
+};
+
+User.addAccount = function(user, account, cb) {
+  User(user, (err, user) => {
+    if (err) { return cb(err); }
+    user.addAccount(account, cb);
+  });
 };

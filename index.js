@@ -91,51 +91,49 @@ app.get('/logout', (req, res, next) => {
 
 app.get('/callback', (req, res, next) => {
   if (req.query.denied) {
-    return next(new Error('oauth denied'));
+    return next(new Error('認証に失敗しました: アプリの連携を許可してください'));
   }
   var token = req.query.oauth_token;
   var secret = req.session.secret[token];
   var verifier = req.query.oauth_verifier;
   if (secret == null) {
-    return next(new Error('secret is null'));
+    return next(new Error('認証に失敗しました: クッキーを削除して再度お試しください'));
   } else if (verifier == null) {
-    return next(new Error('verifier is null'));
+    return next(new Error('認証に失敗しました: 認証情報が不正です'));
   }
   delete req.session.secret[token];
   var tw = new Twitter(token, secret, verifier, err => {
     if (err) { return next(err); }
     tw.verify((err, data) => {
       if (err) { return next(err); }
+      /* 軽量化のために最新ツイートを削除 */
       delete data.status;
-      tw.id = data.id_str;
-      var account = new Account(tw);
-      account.pull((err => {
+      Account(data.id_str, (err, account) => {
         if (err) { return next(err); }
-        this.data = data;
-        this.last = Date.now();
+        account.token = token;
+        account.secret = secret;
+        account.addData(data);
         if (req.session.uid == null) {
-          this.push((err => {
-            req.session.uid = this.uid;
+          account.push(err => {
+            req.session.uid = account.uid;
             next();
-          }).bind(this));
+          });
         } else {
-          if (this.uid == null) {
-            this.uid = req.session.uid;
+          if (account.uid == null) {
+            account.uid = req.session.uid;
           }
-          User(req.session.uid, ((err, user) => {
-            user.addAccount(this, (err => {
-              req.session.user = null;
-              req.session.accounts = null;
-              this.push(next);
-            }).bind(this));
-          }).bind(this));
+          User.addAccount(req.session.uid, account, err => {
+            req.session.user = null;
+            req.session.accounts = null;
+            account.push(next);
+          });
         }
-      }).bind(account));
+      });
     });
   });
 });
 
-app.post('/update', (req, res, next) => {
+app.post('/sort', (req, res, next) => {
   if (req.body && req.body.accounts != null) {
     var accounts = req.body.accounts;
     accounts = accounts.filter((a, i) => {
@@ -165,6 +163,9 @@ app.post('/remove', (req, res, next) => {
     var id = req.body.id;
     return Account(id, (err, account) => {
       if (err) { return next(err); }
+      if (account.uid !== req.session.uid) {
+        return next(new Error('アカウント情報が不正です'));
+      }
       account.remove(err => {
         if (err) { return next(err); }
         req.session.accounts = null;
@@ -177,17 +178,17 @@ app.post('/remove', (req, res, next) => {
   next(new Error('アカウント情報が不正です'));
 });
 
-  app.get('*', (req, res) => res.redirect('/'));
+app.get('*', (req, res) => res.redirect('/'));
 
-  /* error */
-  app.use('*', (err, req, res, next) => {
-    console.error(err.stack);
-    res.status(err.status || 500);
-    res.render('index', {
-      error: err.message,
-      session: req.session
-    });
+/* error */
+app.use('*', (err, req, res, next) => {
+  console.error(err.stack);
+  res.status(err.status || 500);
+  res.render('index', {
+    error: err.message,
+    session: req.session
   });
+});
 
-  /* listen */
-  app.listen(config.server.socket);
+/* listen */
+app.listen(config.server.socket);
