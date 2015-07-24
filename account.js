@@ -68,10 +68,18 @@ Account.prototype.remove = function(cb) {
 };
 
 Account.prototype.addData = function(data) {
-  data.timestamp = Date.now();
+  var day = 24 * 60 * 60 * 1000;
+  var now = Date.now();
+  var base = (now / day | 0) * day;
+  data.timestamp = now;
   /* 新しいデータは前から */
   if (this.data == null) {
     this.data = [];
+  }
+  if (this.data.length > 1
+    && base <= this.data[0].timestamp
+    && base <= this.data[1].timestamp) {
+    this.data.shift();
   }
   this.data.unshift(data);
   /* this.data = this.data.slice(0, config.account.dataLength); */
