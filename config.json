@@ -26,5 +26,9 @@
       "access": "https://api.twitter.com/oauth/access_token",
       "api": "https://api.twitter.com/1.1/"
     }
+  },
+  "user": {
+    "tag": "#favcounter",
+    "format": "@{$name} {prev.date(m/d)}-{now.date(m/d)} のふぁぼ数: {fav} ({prev.fav} → {now.fav}) \n{url} {tag}"
   }
 }
