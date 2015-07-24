@@ -81,6 +81,15 @@ Account.prototype.addData = function(data) {
     && base <= this.data[1].timestamp) {
     this.data.shift();
   }
+  if (this.data.length > 0) {
+    this.data[0] = {
+      favourites_count: this.data[0].favourites_count,
+      statuses_count: this.data[0].statuses_count,
+      friends_count: this.data[0].friends_count,
+      followers_count: this.data[0].followers_count,
+      timestamp: this.data[0].timestamp
+    };
+  }
   this.data.unshift(data);
   /* this.data = this.data.slice(0, config.account.dataLength); */
 };
