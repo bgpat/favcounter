@@ -68,9 +68,12 @@ Account.prototype.remove = function(cb) {
 };
 
 Account.prototype.addData = function(data) {
-  var day = 24 * 60 * 60 * 1000;
-  var now = Date.now();
-  var base = (now / day | 0) * day;
+  var now = new Date();
+  var base = (new Date(
+    now.getFullYear,
+    now.getMonth,
+    now.getDate)).getTime();
+  now = now.getTime();
   data.timestamp = now;
   /* 新しいデータは前から */
   if (this.data == null) {
