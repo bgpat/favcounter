@@ -1,0 +1,30 @@
+<% var user = session.user; %>
+<div class="container">
+<h2>設定</h2>
+<table class="table config-table">
+<tbody>
+<tr>
+<th>定時ツイート</th>
+<td>
+<input type="checkbox" id="config-tweet" <%= user.config.tweet ? 'checked="checked" ' : '' %>/>
+毎日0時にふぁぼ数などをツイートやDMでお知らせします
+</td>
+</tr>
+<tr>
+<th>ランキング</th>
+<td>
+<input type="checkbox" id="config-rank" <%= user.config.rank ? 'checked="checked" ' : '' %>/>
+毎日更新されるふぁぼ数などのランキングにアカウント情報を公開します
+</td>
+</tr>
+<tr>
+<th>フォーマット</th>
+<td>
+定時ツイートのフォーマットを指定します
+<textarea id="config-format" class="config-format"><%= user.config.format %></textarea>
+<textarea class="config-format config-format-preview" readonly="readonly" placeholder="上のボックスを編集するとここにプレビューが表示されます"></textarea>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
