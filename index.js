@@ -110,8 +110,8 @@ app.get('/callback', (req, res, next) => {
       delete data.status;
       Account(data.id_str, (err, account) => {
         if (err) { return next(err); }
-        account.token = token;
-        account.secret = secret;
+        account.token = tw.token;
+        account.secret = tw.secret;
         account.addData(data);
         if (req.session.uid == null) {
           account.push(err => {
