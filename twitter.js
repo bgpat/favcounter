@@ -64,11 +64,14 @@ Twitter.prototype.get = function(path, data, callback) {
   }
   var url = config.oauth.urls.api + path + '.json';
   if (data != null) {
-    url += '?';
+    var list = [];
     for (var key in data) {
-      url += encodeURIComponent(key) + '=';
-      url += encodeURIComponent(data[key]);
+      list.push([
+        encodeURIComponent(key),
+        encodeURIComponent(data[key])
+      ].join('='));
     }
+    url += '?' + list.join('&');
   }
   oauth.get(
     url,
