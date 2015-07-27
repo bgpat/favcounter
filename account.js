@@ -70,27 +70,27 @@ Account.prototype.remove = function(cb) {
 Account.prototype.addData = function(data) {
   var now = new Date();
   var base = (new Date(
-    now.getFullYear,
-    now.getMonth,
-    now.getDate)).getTime();
+    now.getFullYear(),
+    now.getMonth(),
+    now.getDate())).getTime();
   now = now.getTime();
+  var len = this.data.length;
   data.timestamp = now;
-  /* 新しいデータは前から */
+  data.temporary = len > 0 && base <= this.data[0].timestamp;
   if (this.data == null) {
     this.data = [];
   }
-  if (this.data.length > 1
-    && base <= this.data[0].timestamp
-    && base <= this.data[1].timestamp) {
+  if (len > 1 && this.data[0].temporary) {
     this.data.shift();
   }
-  if (this.data.length > 0) {
+  if (len > 0) {
     this.data[0] = {
       favourites_count: this.data[0].favourites_count,
       statuses_count: this.data[0].statuses_count,
       friends_count: this.data[0].friends_count,
       followers_count: this.data[0].followers_count,
-      timestamp: this.data[0].timestamp
+      timestamp: this.data[0].timestamp,
+      temporary: this.data[0].temporary
     };
   }
   this.data.unshift(data);
