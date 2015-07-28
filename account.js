@@ -23,6 +23,16 @@ var Account = function(arg, cb) {
 };
 module.exports = Account;
 
+Account.getAll = function(cb) {
+  cb = cb || function(){};
+  return db.hkeys('account', (err, id) => {
+    db.hmget('account', id, (err, accounts) => {
+      if (err) { return cb(err); }
+      cb(err, accounts.map(a => Account(JSON.parse(a))));
+    });
+  });
+};
+
 Account.prototype.pull = function(cb) {
   cb = cb || function(){};
   db.hget('account', this.id, ((err, account) => {
