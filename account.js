@@ -84,12 +84,12 @@ Account.prototype.addData = function(data) {
     now.getMonth(),
     now.getDate())).getTime();
   now = now.getTime();
-  var len = this.data.length;
-  data.timestamp = now;
-  data.temporary = len > 0 && base <= this.data[0].timestamp;
   if (this.data == null) {
     this.data = [];
   }
+  var len = this.data.length;
+  data.timestamp = now;
+  data.temporary = len > 0 && base <= this.data[0].timestamp;
   if (len > 1 && this.data[0].temporary) {
     this.data.shift();
   }
