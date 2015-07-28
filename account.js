@@ -20,6 +20,17 @@ var Account = function(arg, cb) {
   this.id = arg.id;
   this.data = arg.data || [];
   this.uid = arg.uid;
+  Object.defineProperty(this.data, 'last', {
+    get: () => {
+      for (var i = 0; i < this.data.length; i++) {
+        var data = this.data[i];
+        if (data.temporary) {
+          return data;
+        }
+        return null;
+      }
+    }.bind(this)
+  });
 };
 module.exports = Account;
 
@@ -84,9 +95,6 @@ Account.prototype.addData = function(data) {
     now.getMonth(),
     now.getDate())).getTime();
   now = now.getTime();
-  if (this.data == null) {
-    this.data = [];
-  }
   var len = this.data.length;
   data.timestamp = now;
   data.temporary = len > 0 && base <= this.data[0].timestamp;
