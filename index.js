@@ -21,6 +21,9 @@ app.set('views', __dirname + '/views');
 app.use(express.static(__dirname + '/public'));
 app.use(bodyParser.json());
 
+/* cron */
+require('./fetch')();
+
 /* session */
 app.use(expressSession({
   secret: config.server.session.secret,
