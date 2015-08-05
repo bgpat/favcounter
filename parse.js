@@ -29,7 +29,7 @@ var parseFormat = function(format, data) {
       }
     }
     return a;
-  });
+  }).slice(0, 140);
 }
 
 if (typeof module === 'object') {
