@@ -29,6 +29,7 @@
   },
   "user": {
     "tag": "#favcounter",
-    "format": "@{$name} {prev.date(m/d)}-{now.date(m/d)} のふぁぼ数: {fav} ({prev.fav} → {now.fav}) \n{url} {tag}"
+    "url": "http://example.com/",
+    "format": "@{id} {prev.date(M/D)} のふぁぼ数: {fav} ({prev.fav} → {now.fav})\n{url} {tag}"
   }
 }
