@@ -114,3 +114,8 @@ Account.prototype.addData = function(data) {
   this.data.unshift(data);
   /* this.data = this.data.slice(0, config.account.dataLength); */
 };
+
+Account.prototype.getData = function(index) {
+  var data = this.data.filter(d => !d.temporary);
+  return data;
+};

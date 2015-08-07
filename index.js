@@ -22,7 +22,13 @@ app.use(express.static(__dirname + '/public'));
 app.use(bodyParser.json());
 
 /* cron */
-require('./fetch')();
+{
+  var fetch = require('./fetch');
+  var cb = function(){
+    fetch(cb);
+  };
+  fetch(cb);
+}
 
 /* session */
 app.use(expressSession({
@@ -81,7 +87,7 @@ app.get('/reload', (req, res, next) => {
 });
 
 app.get('/login', (req, res) => {
-   Twitter.getAuthorizeUrl((err, url, token, secret) => {
+  Twitter.getAuthorizeUrl((err, url, token, secret) => {
     req.session.secret[token] = secret;
     res.redirect(url);
   });
@@ -198,6 +204,55 @@ app.post('/config', (req, res, next) => {
       res.end(JSON.stringify(user));
     });
   });
+});
+
+app.post('/parse', (req, res, next) => {
+  if (typeof req.body !== 'object') {
+    return next(new Error('設定情報が不正です'));
+  }
+  var accounts = req.session.accounts.slice(0);
+  var first = Account(accounts.shift());
+  var firstData = first.getData();
+  var now = JSON.parse(JSON.stringify(firstData[0]));
+  var prev = JSON.parse(JSON.stringify(firstData[1]));
+  accounts.forEach(a => {
+    var d = Account(a).getData();
+    if (d.length >= 0) {
+      now.favourites_count += d[0].favourites_count;
+      now.statuses_count += d[0].statuses_count;
+      now.friends_count += d[0].friends_count;
+      now.followers_count += d[0].followers_count;
+    }
+    if (d.length >= 1) {
+      prev.favourites_count += d[1].favourites_count;
+      prev.statuses_count += d[1].statuses_count;
+      prev.friends_count += d[1].friends_count;
+      prev.followers_count += d[1].followers_count;
+    }
+  });
+  var data = {
+    id: now.screen_name,
+    tag: config.user.tag,
+    url: config.user.url + 'user/' + req.session.user.uid,
+    now: {
+      fav: now.favourites_count,
+      tweet: now.statuses_count,
+      follow: now.friends_count,
+      follower: now.followers_count,
+      date: now.timestamp
+    },
+    prev: {
+      fav: prev.favourites_count,
+      tweet: prev.statuses_count,
+      follow: prev.friends_count,
+      follower: prev.followers_count,
+      date: prev.timestamp
+    }
+  };
+  res.contentType('json');
+  res.end(JSON.stringify({
+    text: require('./parse')(req.body.format, data)
+  }));
 });
 
 app.get('*', (req, res) => res.redirect('/'));

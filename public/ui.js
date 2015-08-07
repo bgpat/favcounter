@@ -100,7 +100,7 @@ $(function(){
   });
 
 
-  $('.config-table :input').on('change keypress', function(e){
+  $('.config-table :input').on('change', function(e){
     $.ajax({
       type: 'POST',
       url: '/config',
@@ -113,6 +113,21 @@ $(function(){
       dataType: 'json'
     });
   });
+
+  $('#config-format').on('change', function(e){
+    $.ajax({
+      type: 'POST',
+      url: '/parse',
+      data: JSON.stringify({
+        format: $(this).val()
+      }),
+      contentType: 'application/json',
+      dataType: 'json',
+      success: function(data){
+        $('.config-format-preview').text(data.text);
+      }
+    });
+  }).trigger('change');
 
   $('tbody.draggable td.account-grip')
   .on('mousedown', function(e){

@@ -2,7 +2,7 @@
 
 var parseFormat = function(format, data) {
   return format.replace(/\{((?:\\.|[^\\}])+)\}/g, function(a, b){
-    var m = b.match(/^(?:(tag|url)|(now|prev)\.)?(fav|tweet|follow|follower|date\(((?:\\.|[^\\)])+)\))$/);
+    var m = b.match(/^(?:(id|tag|url)|(?:(now|prev)\.)?(fav|tweet|follow|follower|date\(((?:\\.|[^\\)])+)\)))$/);
     if (m) {
       if (m[1] != null) {
         return data[m[1]];
@@ -24,12 +24,13 @@ var parseFormat = function(format, data) {
           };
           var s = fn[c]() + '';
           var z = new Array(Math.max(0, f.length - s.length) + 1).join(0);
+          console.log(f, c, s, z);
           return z + s;
         });
       }
     }
     return a;
-  }).slice(0, 140);
+  }).replace(/\\(\s|\S)/g, '$1').slice(0, 140);
 }
 
 if (typeof module === 'object') {

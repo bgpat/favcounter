@@ -59,6 +59,7 @@ th, td {
 	text-align: left;
 }
 
-.config-format {
+#config-format {
 	width: 100%;
+	height: 100px;
 }
