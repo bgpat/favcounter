@@ -24,7 +24,6 @@ var parseFormat = function(format, data) {
           };
           var s = fn[c]() + '';
           var z = new Array(Math.max(0, f.length - s.length) + 1).join(0);
-          console.log(f, c, s, z);
           return z + s;
         });
       }
