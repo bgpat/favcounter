@@ -11,7 +11,6 @@ var fetch = function(cb, soon) {
     d.setMinutes(59);
     d.setSeconds(59);
     d.setMilliseconds(999);
-    console.log(d.getTime() - Date.now());
     return setTimeout(() => {
       fetch(cb, true);
     }, d.getTime() - Date.now());
