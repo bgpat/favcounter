@@ -76,7 +76,9 @@ app.all('*', (req, res, next) => {
 app.get('/', (req, res) => {
   res.render('index', {
     error: null,
-    session: req.session
+    session: req.session,
+    user: req.session.user,
+    accounts: req.session.accounts
   });
 });
 
@@ -100,8 +102,7 @@ app.get('/logout', (req, res, next) => {
 
 app.get('/user/:uid', (req, res, next) => {
   User(req.params.uid, (err, user) => {
-    console.log(user);
-    if (user.public) {
+    if (user.config.public) {
       return user.getAccounts((err, accounts) => {
         res.render('user', {
           error: null,

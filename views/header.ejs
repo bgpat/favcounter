@@ -14,12 +14,11 @@
 </div>
 <div id="navbar" class="navbar-collapse collapse navbar-right">
 <ul class="nav navbar-nav">
-<% var accounts = session.accounts; %>
-<% if (accounts && accounts.length > 0) { %>
+<% if (session.accounts && session.accounts.length > 0) { %>
 <li class="dropdown">
 <a class="dropdown-toggle" role="button" data-toggle="dropdown" href="#">
-<span class="icon"><img src="<%= accounts[0].data[0].profile_image_url_https %>" /></span>
-<%= accounts[0].data[0].screen_name %>
+<span class="icon"><img src="<%= session.accounts[0].data[0].profile_image_url_https %>" /></span>
+<%= session.accounts[0].data[0].screen_name %>
 <span class="caret"></span>
 </a>
 <ul class="dropdown-menu">
@@ -45,9 +44,11 @@
 </div>
 </nav>
 <div class="container">
+<!--
 <div class="page-header">
 <h1>ふぁぼかうんたー</h1>
 </div>
+-->
 <% if (error != null) { %>
 <div class="alert alert-danger" role="alert">
 <span class="glyphicon glyphicon-exclamation-sign"></span>
