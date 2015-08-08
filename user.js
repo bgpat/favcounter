@@ -11,7 +11,8 @@ var User = function(arg, cb) {
     });
     return user;
   }
-  if (typeof arg === 'string' || typeof arg === 'number') {
+  var type = typeof arg;
+  if (type === 'string' || type === 'number') {
     this.uid = arg;
     return this.pull(cb);
   }
@@ -20,7 +21,7 @@ var User = function(arg, cb) {
   this.accounts = arg.accounts || [];
   this.config = arg.config || {
     format: config.user.format,
-    rank: true,
+    public: true,
     tweet: true
   };
 };

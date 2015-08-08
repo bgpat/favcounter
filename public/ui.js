@@ -105,8 +105,8 @@ $(function(){
       type: 'POST',
       url: '/config',
       data: JSON.stringify({
-        tweet: $('#config-tweet').val(),
-        rank: $('#config-rank').val(),
+        tweet: $('#config-tweet').prop('checked'),
+        public: $('#config-public').prop('checked'),
         format: $('#config-format').val()
       }),
       contentType: 'application/json',

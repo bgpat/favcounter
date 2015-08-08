@@ -10,8 +10,10 @@ var Account = function(arg, cb) {
     });
     return account;
   }
-  if (typeof arg === 'string') {
+  var type = typeof arg;
+  if (type === 'string' || type === 'number') {
     this.id = arg;
+    this.data = [];
     return this.pull(cb);
   }
   arg = arg || {};

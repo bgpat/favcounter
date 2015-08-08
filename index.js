@@ -98,6 +98,34 @@ app.get('/logout', (req, res, next) => {
   next();
 });
 
+app.get('/user/:uid', (req, res, next) => {
+  User(req.params.uid, (err, user) => {
+    console.log(user);
+    if (user.public) {
+      return user.getAccounts((err, accounts) => {
+        res.render('user', {
+          error: null,
+          session: req.session,
+          user: user,
+          accounts: accounts
+        });
+      });
+    }
+    next(new Error('このページは存在しません'));
+  });
+});
+
+app.get('/account/:id', (req, res, next) => {
+  Account(req.params.id, (err, account) => {
+    res.json(account.data.map(d => {
+      return {
+        date: new Date(d.timestamp) + '',
+        fav: d.favourites_count
+      };
+    }));
+  });
+});
+
 app.get('/callback', (req, res, next) => {
   if (req.query.denied) {
     return next(new Error('認証に失敗しました: アプリの連携を許可してください'));
@@ -194,8 +222,8 @@ app.post('/config', (req, res, next) => {
   User(req.session.uid, (err, user) => {
     user.config = {
       format: req.body.format || config.user.format,
-      tweet: req.body.tweet || true,
-      rank: req.body || true
+      tweet: !!req.body.tweet,
+      public: !!req.body.public
     };
     req.session.user = user;
     user.push(err => {
@@ -231,7 +259,7 @@ app.post('/parse', (req, res, next) => {
     }
   });
   var data = {
-    id: now.screen_name,
+    id: first.data[0].screen_name,
     tag: config.user.tag,
     url: config.user.url + 'user/' + req.session.user.uid,
     now: {
