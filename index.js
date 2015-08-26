@@ -68,6 +68,8 @@ app.all('*', (req, res, next) => {
       sess.accounts = accounts;
       next();
     });
+  } else {
+    sess.accounts = sess.accounts.map(a => Account(a));
   }
   next();
 });
@@ -102,7 +104,7 @@ app.get('/logout', (req, res, next) => {
 
 app.get('/user/:uid', (req, res, next) => {
   User(req.params.uid, (err, user) => {
-    if (user.config.public) {
+    if (user.uid != null &&  user.config.public) {
       return user.getAccounts((err, accounts) => {
         res.render('user', {
           error: null,
@@ -140,6 +142,7 @@ app.get('/callback', (req, res, next) => {
     return next(new Error('認証に失敗しました: 認証情報が不正です'));
   }
   delete req.session.secret[token];
+  var uid = req.session.uid;
   var tw = new Twitter(token, secret, verifier, err => {
     if (err) { return next(err); }
     tw.verify((err, data) => {
@@ -151,16 +154,18 @@ app.get('/callback', (req, res, next) => {
         account.token = tw.token;
         account.secret = tw.secret;
         account.addData(data);
-        if (req.session.uid == null) {
-          account.push(err => {
-            req.session.uid = account.uid;
-            next();
+        if (uid == null) {
+          req.session.regenerate(() => {
+            account.push(err => {
+              req.session.uid = account.uid;
+              next();
+            });
           });
         } else {
           if (account.uid == null) {
-            account.uid = req.session.uid;
+            account.uid = uid;
           }
-          User.addAccount(req.session.uid, account, err => {
+          User.addAccount(uid, account, err => {
             req.session.user = null;
             req.session.accounts = null;
             account.push(next);
@@ -292,7 +297,9 @@ app.use('*', (err, req, res, next) => {
   res.status(err.status || 500);
   res.render('index', {
     error: err.message,
-    session: req.session
+    session: req.session,
+    user: req.session.user,
+    accounts: req.session.accounts
   });
 });
 

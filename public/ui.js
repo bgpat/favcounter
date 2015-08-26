@@ -1,3 +1,4 @@
+google.load('visualization', '1', {'packages':['corechart']});
 $(function(){
   var dragging = null;
 
@@ -157,5 +158,35 @@ $(function(){
       holdDrag(e);
       e.preventDefault();
     }
+  });
+
+  google.setOnLoadCallback(function(){
+    var graph = $('#graph');
+    var len = 0;
+    var id = graph.data('id');
+    var adata = graph.data('data').map(a => {
+      if (len < a.length) {
+        len = a.length;
+      }
+      return a.map(d => {
+      return d ? d.favourites_count : null;
+      //return d ? d.statuses_count : null;
+      })
+    });
+    var data = [];
+    var now = new Date();
+    var base = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+    for (var i = 0; i < len; i++) {
+      data[i] = adata.map(a => a[i]);
+      data[i].unshift(new Date(base - i * 24 * 60 * 60 * 1000));
+    }
+    data.unshift(['date']);
+    data[0].push.apply(data[0], id);
+    var options = {
+      title: 'fav',
+      hAxis: {title: 'date',  titleTextStyle: {color: '#333'}},
+    };
+    var chart = new google.visualization.AreaChart(graph.get(0));
+    chart.draw(google.visualization.arrayToDataTable(data), options);
   });
 });

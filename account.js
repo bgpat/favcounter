@@ -1,6 +1,7 @@
 'use strict';
 
 var db = require('./db');
+var Data = require('./data');
 
 var Account = function(arg, cb) {
   cb = cb || function(){};
@@ -13,26 +14,15 @@ var Account = function(arg, cb) {
   var type = typeof arg;
   if (type === 'string' || type === 'number') {
     this.id = arg;
-    this.data = [];
+    this.data = Data([]);
     return this.pull(cb);
   }
   arg = arg || {};
   this.token = arg.token;
   this.secret = arg.secret;
   this.id = arg.id;
-  this.data = arg.data || [];
+  this.data = Data(arg.data || []);
   this.uid = arg.uid;
-  Object.defineProperty(this.data, 'last', {
-    get: () => {
-      for (var i = 0; i < this.data.length; i++) {
-        var data = this.data[i];
-        if (data.temporary) {
-          return data;
-        }
-        return null;
-      }
-    }.bind(this)
-  });
 };
 module.exports = Account;
 
