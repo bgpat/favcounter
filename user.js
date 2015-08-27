@@ -27,6 +27,16 @@ var User = function(arg, cb) {
 };
 module.exports = User;
 
+User.getAll = function(cb) {
+  cb = cb || function(){};
+  return db.hkeys('user', (err, uid) => {
+    db.hmget('user', uid, (err, users) => {
+      if (err) { return cb(err); }
+      cb(err, users.map(u => User(JSON.parse(u))));
+    });
+  });
+};
+
 User.prototype.pull = function(cb) {
   cb = cb || function(){};
   db.hget('user', this.uid, ((err, user) => {
