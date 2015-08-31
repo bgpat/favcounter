@@ -255,6 +255,7 @@ app.post('/parse', (req, res, next) => {
   var parse = require('./parse');
   var sess = req.session;
   var data = tweet.toData(sess.accounts, sess.user);
+  console.dir(data, {depth: 10});
   res.json({
     text: parse(req.body.format, data)
   });

@@ -48,4 +48,12 @@
 </table>
 <% } %>
 </div>
+<div id="accounts-graph">
+<ul class="nav nav-tabs">
+<li role="presentation" class="active"><a href="#favourites">fav</a></li>
+<li role="presentation"><a href="#statuses">tweet</a></li>
+<li role="presentation"><a href="#friends">follow</a></li>
+<li role="presentation"><a href="#followers">follower</a></li>
+</ul>
 <div id="graph" data-id="<%= JSON.stringify(accounts.map(a => a.data[0].screen_name)) %>" data-data="<%= JSON.stringify(accounts.map(a => a.data.statistics)) %>" style="width:100%;height:400px"></div>
+</div>

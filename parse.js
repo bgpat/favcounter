@@ -12,7 +12,7 @@ var parseFormat = function(format, data) {
       } else if (m[4] == null) {
         return data[m[2]][m[3]];
       } else {
-        var d = new Date(data[m[2]].date);
+        var d = new Date(data[m[2]].timestamp);
         return m[4].replace(/([YMDhms])\1{0,3}/g, function(f, c){
           var fn = {
             Y: function(){ return d.getFullYear(); },

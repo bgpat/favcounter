@@ -1,6 +1,7 @@
 'use strict';
 
 var Account = require('./account');
+var Data = require('./data');
 var parse = require('./parse');
 var config = require('./config');
 
@@ -9,45 +10,57 @@ function copy(obj) {
   return JSON.parse(JSON.stringify(obj));
 }
 
+/* 合計を求める */
+function sum(arr, fn) {
+  return arr.reduce((a, b, c) => {
+    return a + (Number(fn(b, c)) || 0);
+  }, 0);
+}
+
 /* アカウントデータを使いやすく変換 */
 exports.toData = function(accounts, user) {
-  accounts = copy(accounts);
-  var first = Account(accounts.shift());
-  var firstData = first.getData();
-  var now = firstData[0];
-  var prev = firstData[1] || now;
-  accounts.forEach(a => {
-    var d = Account(a).getData();
-    if (d.length >= 0) {
-      now.favourites_cont += d[0].favourites_count || 0;
-      now.statuses_count += d[0].statuses_count || 0;
-      now.friends_count += d[0].friends_count || 0;
-      now.followers_count += d[0].followers_count || 0;
-    }
-    if (d.length >= 1) {
-      prev.favourites_count += d[1].favourites_count || 0;
-      prev.statuses_count += d[1].statuses_count || 0;
-      prev.friends_count += d[1].friends_count || 0;
-      prev.followers_count += d[1].followers_count || 0;
-    }
-  });
+  accounts = copy(accounts).map(a => Account(a));
   return {
-    id: first.data[0].screen_name,
+    id: accounts[0].data.recent.screen_name,
     tag: config.user.tag,
     url: exports.url(user.uid),
     now: {
-      fav: now.favourites_count,
-      tweet: now.statuses_count,
-      follow: now.friends_count,
-      follower: now.followers_count,
-      date: now.timestamp
+      fav: sum(
+        accounts,
+        a => a.data.statistics[0].favourites_count
+      ),
+      tweet: sum(
+        accounts,
+        a => a.data.statistics[0].statuses_count
+      ),
+      follow: sum(
+        accounts,
+        a => a.data.statistics[0].friends_count
+      ),
+      follower: sum(
+        accounts,
+        a => a.data.statistics[0].followers_count
+      ),
+      timestamp: accounts[0].data.last.timestamp
     },
     prev: {
-      fav: prev.favourites_count,
-      tweet: prev.statuses_count,
-      follow: prev.friends_count,
-      follower: prev.followers_count,
-      date: prev.timestamp
+      fav: sum(
+        accounts,
+        a => a.data.statistics[1].favourites_count
+      ),
+      tweet: sum(
+        accounts,
+        a => a.data.statistics[1].statuses_count
+      ),
+      follow: sum(
+        accounts,
+        a => a.data.statistics[1].friends_count
+      ),
+      follower: sum(
+        accounts,
+        a => a.data.statistics[1].followers_count
+      ),
+      timestamp: accounts[0].data.last.timestamp - (1000 * 60 * 60 * 24)
     }
   };
 };
