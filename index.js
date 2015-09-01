@@ -29,8 +29,10 @@ app.use(bodyParser.json());
     User.getAll((err, users) => {
       if (err) { return console.error(err); }
       users.forEach(user => {
-        var tweet = require('./tweet');
-        var tw = new tweet.Tweet(user);
+        if (user && user.config.tweet) {
+          var tweet = require('./tweet');
+          var tw = new tweet.Tweet(user);
+        }
       });
     });
   };
