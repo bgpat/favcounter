@@ -63,3 +63,8 @@ th, td {
 	width: 100%;
 	height: 100px;
 }
+
+.graph {
+	width:100%;
+	height:400px;
+}

@@ -160,8 +160,11 @@ $(function(){
     }
   });
 
-    var graph = $('#accounts-graph #graph');
-    var chart;
+  var graph = $('#accounts-graph .graph');
+  var chart;
+  var diffCheckbox = $('#accounts-graph .graph-diff').on('click', function(){
+    $('#accounts-graph > .nav-tabs > li.active > a').click();
+  });
   $('#accounts-graph > .nav-tabs a').on('click', function(e){
     e.preventDefault();
     $(this).tab('show');
@@ -175,9 +178,20 @@ $(function(){
         return d ? d[$(this).attr('href').slice(1) + '_count'] : null;
       }.bind(this))
     }.bind(this));
-    var data = [];
     var now = new Date();
     var base = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+    if (diffCheckbox.prop('checked')) {
+      adata = adata.map(function(a){
+        var prev = a.shift();
+        return a.map(function(n){
+          var res = prev - n;
+          prev = n;
+          return res;
+        });
+      });
+      base -= 24 * 60 * 60 * 1000;
+    }
+    var data = [];
     for (var i = 0; i < len; i++) {
       data[i] = adata.map(function(a){ return a[i]; });
       data[i].unshift(new Date(base - i * 24 * 60 * 60 * 1000));
@@ -185,12 +199,16 @@ $(function(){
     data.unshift(['date']);
     data[0].push.apply(data[0], id);
     var options = {
-      hAxis: {title: 'date',  titleTextStyle: {color: '#333'}},
+      legend: { position: 'bottom' },
+      hAxis: {
+        title: 'date',
+        titleTextStyle: { color: '#333' }
+      }
     };
     chart.draw(google.visualization.arrayToDataTable(data), options);
   });
   google.setOnLoadCallback(function(){
-    chart = new google.visualization.AreaChart(graph.get(0));
+    chart = new google.visualization.LineChart(graph.get(0));
     graph.data('chart', chart);
     $('#accounts-graph > .nav-tabs li.active a').click();
   });
