@@ -89,7 +89,8 @@ app.get('/', (req, res) => {
     error: null,
     session: req.session,
     user: req.session.user,
-    accounts: req.session.accounts
+    accounts: req.session.accounts,
+    card: null
   });
 });
 
@@ -115,11 +116,17 @@ app.get('/user/:uid', (req, res, next) => {
   User(req.params.uid, (err, user) => {
     if (user.uid != null &&  user.config.public) {
       return user.getAccounts((err, accounts) => {
+        var site = '@' + accounts[0].data.recent.screen_name;
+        var title = site + ' のふぁぼかうんたー';
         res.render('user', {
           error: null,
           session: req.session,
           user: user,
-          accounts: accounts
+          accounts: accounts,
+          card: {
+            site: site,
+            title: title
+          }
         });
       });
     }
@@ -273,7 +280,8 @@ app.use('*', (err, req, res, next) => {
     error: err.message,
     session: req.session,
     user: req.session.user,
-    accounts: req.session.accounts
+    accounts: req.session.accounts,
+    card: null
   });
 });
 

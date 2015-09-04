@@ -1,0 +1,10 @@
+<% if (!card) { %>
+<%   card = {}; %>
+<% } %>
+<% card.card = card.card || 'summary'; %>
+<% card.site = card.site || '@p1o1c1k1y'; %>
+<% card.title = card.title || 'ふぁぼかうんたー'; %>
+<% card.description = card.description || '１日のお気に入り登録数などを数えるアプリ'; %>
+<% for (var key in card) { %>
+<meta name="twitter:<%=key%>" content="<%=card[key]%>" />
+<% } %>
