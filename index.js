@@ -31,7 +31,9 @@ app.use(bodyParser.json());
       users.forEach(user => {
         if (user && user.config.tweet) {
           var tweet = require('./tweet');
-          var tw = new tweet.Tweet(user);
+          var tw = new tweet.Tweet(user, (err, res) => {
+            console.log(user.uid, !err);
+          });
         }
       });
     });

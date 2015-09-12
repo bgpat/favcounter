@@ -77,14 +77,24 @@ exports.url = function(uid) {
 };
 
 /* ツイート */
-exports.Tweet = function(user) {
+exports.Tweet = function(user, cb) {
+  cb = cb || function(){};
   user.getAccounts((err, accounts) => {
     if (err) { return console.error(err); }
     var text = exports.generate(accounts, user);
     var Twitter = require('./twitter');
-    var tw = new Twitter(accounts.shift());
+    var first = Account(accounts.shift());
+    var tw = new Twitter(first);
     tw.post('statuses/update', {status: text}, (err, res) => {
-      console.log(err, res);
+      if (err) {
+        err.timestamp = Date.now();
+        if (err.data != null) {
+          err.data = JSON.parse(err.data);
+        }
+        first.errors.push(err);
+        first.push();
+      }
+      cb(err, res);
     });
   });
 };

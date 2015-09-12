@@ -22,6 +22,7 @@ var Account = function(arg, cb) {
   this.secret = arg.secret;
   this.id = arg.id;
   this.data = Data(arg.data || []);
+  this.errors = arg.errors || [];
   this.uid = arg.uid;
 };
 module.exports = Account;
