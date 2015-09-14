@@ -2,18 +2,15 @@ var Twitter = require('./twitter');
 var Account = require('./account');
 var User = require('./user');
 var db = require('./db');
+var Date = require('./date').Date;
 
 var fetch = function(cb, soon) {
   cb = cb || function(){};
   if (!soon) {
-    var d = new Date();
-    d.setHours(23);
-    d.setMinutes(59);
-    d.setSeconds(59);
-    d.setMilliseconds(999);
+    var base = Date.today.nextDay().time - 1;
     return setTimeout(() => {
       fetch(cb, true);
-    }, d.getTime() - Date.now());
+    }, base - Date.now.time);
   }
   Account.getAll((err, accounts) => {
     for (var i = 0; i < accounts.length;) {

@@ -2,6 +2,7 @@
 
 var db = require('./db');
 var Data = require('./data');
+var Date = require('./date').Date;
 
 var Account = function(arg, cb) {
   cb = cb || function(){};
@@ -82,14 +83,9 @@ Account.prototype.remove = function(cb) {
 };
 
 Account.prototype.addData = function(data) {
-  var now = new Date();
-  var base = (new Date(
-    now.getFullYear(),
-    now.getMonth(),
-    now.getDate())).getTime();
-  now = now.getTime();
+  var base = Date.today.time;
   var len = this.data.length;
-  data.timestamp = now;
+  data.timestamp = Date.now.time;
   data.temporary = len > 0 && base <= this.data[0].timestamp;
   if (len > 1 && this.data[0].temporary) {
     this.data.shift();

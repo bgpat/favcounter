@@ -11,6 +11,7 @@ var MemcachedStore = require('connect-memcached')(expressSession);
 var Twitter = require('./twitter');
 var Account = require('./account');
 var User = require('./user');
+var Date = require('./date').Date;
 var config = require('./config');
 
 /* config */
@@ -92,6 +93,7 @@ app.get('/', (req, res) => {
     session: req.session,
     user: req.session.user,
     accounts: req.session.accounts,
+    date: Date.today.time,
     card: null
   });
 });
@@ -115,8 +117,24 @@ app.get('/logout', (req, res, next) => {
 });
 
 app.get('/user/:uid', (req, res, next) => {
+  var path = '/user/' + req.params.uid + '/';
+  res.redirect(path + Date.today.toString('YYYYMMDD'));
+});
+
+app.get('/user/:uid/:date', (req, res, next) => {
+  var d = req.params.date.match(/(\d{4})([01]\d)([0-3]\d)/);
+  if (d == null) {
+    next(new Error('このページは存在しません'));
+  }
+  var date = Date.today;
+  date.year = d[1];
+  date.month = d[2];
+  date.date = d[3];
+  if (Date.now.time < date.time) {
+    next(new Error('このページは存在しません'));
+  }
   User(req.params.uid, (err, user) => {
-    if (user.uid != null &&  user.config.public) {
+    if (user.uid != null && user.config.public) {
       return user.getAccounts((err, accounts) => {
         var site = '@' + accounts[0].data.recent.screen_name;
         var title = site + ' のふぁぼかうんたー';
@@ -125,6 +143,7 @@ app.get('/user/:uid', (req, res, next) => {
           session: req.session,
           user: user,
           accounts: accounts,
+          date: date.time,
           card: {
             site: site,
             title: title
@@ -266,7 +285,6 @@ app.post('/parse', (req, res, next) => {
   var parse = require('./parse');
   var sess = req.session;
   var data = tweet.toData(sess.accounts, sess.user);
-  console.dir(data, {depth: 10});
   res.json({
     text: parse(req.body.format, data)
   });
@@ -283,6 +301,7 @@ app.use('*', (err, req, res, next) => {
     session: req.session,
     user: req.session.user,
     accounts: req.session.accounts,
+    date: Date.today.time,
     card: null
   });
 });

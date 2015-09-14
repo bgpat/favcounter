@@ -3,6 +3,7 @@
 var Account = require('./account');
 var Data = require('./data');
 var parse = require('./parse');
+var Date = require('./date').Date;
 var config = require('./config');
 
 /* ディープコピー */
@@ -73,7 +74,8 @@ exports.generate = function(accounts, user) {
 
 /* ユーザーページ */
 exports.url = function(uid) {
-  return config.user.url + 'user/' + uid;
+  var date = Date.today.toString('YYYYMMDD');
+  return config.user.url + 'user/' + uid + '/' + date;
 };
 
 /* ツイート */
@@ -87,7 +89,7 @@ exports.Tweet = function(user, cb) {
     var tw = new Twitter(first);
     tw.post('statuses/update', {status: text}, (err, res) => {
       if (err) {
-        err.timestamp = Date.now();
+        err.timestamp = Date.now.time;
         if (err.data != null) {
           err.data = JSON.parse(err.data);
         }

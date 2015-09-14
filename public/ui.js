@@ -178,8 +178,7 @@ $(function(){
         return d ? d[$(this).attr('href').slice(1) + '_count'] : null;
       }.bind(this))
     }.bind(this));
-    var now = new Date();
-    var base = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+    var base = new Date(graph.data('date'));
     if (diffCheckbox.prop('checked')) {
       adata = adata.map(function(a){
         var prev = a.shift();
