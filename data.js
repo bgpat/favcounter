@@ -7,12 +7,17 @@ module.exports = function(proto) {
     recent: {get: () => this[0]},
     trim: {get: () => this.length && this[0].temporary ? this.slice(1) : this},
     last: {get: () => this.length ? this.trim[0] : null},
+    base: {
+      writable: true,
+      value: Date.today.nextDay().time - 1
+    },
     statistics: {get: () => {
-      var base = Date.today.nextDay().time - 1;
       var arr = [];
-      this.trim.forEach(d => {
-        arr[(base - d.timestamp) / Date.aday | 0] = d;
-      });
+      this.trim.forEach((d => {
+        if (this.base > d.timestamp) {
+          arr[(this.base - d.timestamp) / Date.aday | 0] = d;
+        }
+      }).bind(this));
       arr.reduceRight((c, d, i) => {
         if (d == null) {
           return arr[i] = c;

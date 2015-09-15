@@ -11,6 +11,8 @@ var MemcachedStore = require('connect-memcached')(expressSession);
 var Twitter = require('./twitter');
 var Account = require('./account');
 var User = require('./user');
+var Data = require('./data');
+var tweet = require('./tweet');
 var Date = require('./date').Date;
 var config = require('./config');
 
@@ -56,7 +58,7 @@ app.all('*', (req, res, next) => {
   if (sess.secret == null) {
     sess.secret = {};
   }
-  if (sess.uid != null && sess.user == null) {
+  if (sess.uid != null/* && sess.user == null*/) {
     return User(sess.uid, (err, user) => {
       if (err) { return next(err); }
       sess.uid = user.uid;
@@ -124,20 +126,27 @@ app.get('/user/:uid', (req, res, next) => {
 app.get('/user/:uid/:date', (req, res, next) => {
   var d = req.params.date.match(/(\d{4})([01]\d)([0-3]\d)/);
   if (d == null) {
-    next(new Error('このページは存在しません'));
+    return next(new Error('このページは存在しません'));
   }
   var date = Date.today;
   date.year = d[1];
   date.month = d[2];
   date.date = d[3];
   if (Date.now.time < date.time) {
-    next(new Error('このページは存在しません'));
+    return next(new Error('このページは存在しません'));
   }
   User(req.params.uid, (err, user) => {
     if (user.uid != null && user.config.public) {
       return user.getAccounts((err, accounts) => {
+        accounts.forEach(account => {
+          account.data.base = date.nextDay().time - 1;
+        });
+        if (accounts[0].data.recent == null) {
+          return next(new Error('このページは存在しません'));
+        }
         var site = '@' + accounts[0].data.recent.screen_name;
-        var title = site + ' のふぁぼかうんたー';
+        var title = 0;
+        var data = tweet.toData(accounts, user);
         res.render('user', {
           error: null,
           session: req.session,
@@ -146,7 +155,25 @@ app.get('/user/:uid/:date', (req, res, next) => {
           date: date.time,
           card: {
             site: site,
-            title: title
+            title: [
+              date.prevDay().toString('YYYY/MM/DD'),
+              site,
+              '記録'].join('の'),
+            description: [
+              ['ふぁぼ', 'fav'],
+              ['ツイート', 'tweet'],
+              ['フォロー', 'follow'],
+              ['フォロワー', 'follower']
+            ].map(e => {
+              var now = data.now[e[1]];
+              var prev = data.prev[e[1]];
+              var diff = now - prev;
+              if (diff > 0) {
+                diff = '+' + diff;
+              }
+              return e[0] + '数: ' + diff + ' (' + prev + ' → ' + now + ')';
+            }).join(', ')
+
           }
         });
       });
@@ -157,12 +184,7 @@ app.get('/user/:uid/:date', (req, res, next) => {
 
 app.get('/account/:id', (req, res, next) => {
   Account(req.params.id, (err, account) => {
-    res.json(account.data.map(d => {
-      return {
-        date: new Date(d.timestamp) + '',
-        fav: d.favourites_count
-      };
-    }));
+    res.json(account.data.statistics);
   });
 });
 

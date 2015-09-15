@@ -19,8 +19,11 @@ function sum(arr, fn) {
 }
 
 /* アカウントデータを使いやすく変換 */
-exports.toData = function(accounts, user) {
-  accounts = copy(accounts).map(a => Account(a));
+exports.toData = function(_accounts, user) {
+  var accounts = copy(_accounts).map(a => Account(a));
+  accounts.forEach((account, i) => {
+    account.data = _accounts[i].data;
+  });
   return {
     id: accounts[0].data.recent.screen_name,
     tag: config.user.tag,
