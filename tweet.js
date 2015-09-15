@@ -64,7 +64,7 @@ exports.toData = function(_accounts, user) {
         accounts,
         a => a.data.statistics[1].followers_count
       ),
-      timestamp: accounts[0].data.last.timestamp - (1000 * 60 * 60 * 24)
+      timestamp: accounts[0].data.last.timestamp - Date.aday
     }
   };
 };
