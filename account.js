@@ -85,6 +85,7 @@ Account.prototype.remove = function(cb) {
 Account.prototype.addData = function(data) {
   var base = Date.today.time;
   var len = this.data.length;
+  delete data.status;
   data.timestamp = Date.now.time;
   data.temporary = len > 0 && base <= this.data[0].timestamp;
   if (len > 1 && this.data[0].temporary) {
