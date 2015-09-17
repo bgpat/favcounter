@@ -1,0 +1,15 @@
+<% include header %>
+<div>
+<h2><%= account.data.recent.screen_name%> のTwitter活動記録</h2>
+<div id="account-graph">
+<ul class="nav nav-tabs">
+<li class="active"><a href="#favourites">fav</a></li>
+<li><a href="#statuses">tweet</a></li>
+<li><a href="#friends">follow</a></li>
+<li><a href="#followers">follower</a></li>
+</ul>
+<div class="graph" data-id="<%= account.data.recent.screen_name %>" data-data="<%= JSON.stringify(account.data.statistics) %>" data-date="<%= date %>"></div>
+</div>
+</div>
+<% include footer %>
+
