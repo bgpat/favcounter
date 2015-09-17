@@ -12,9 +12,18 @@ function copy(obj) {
 }
 
 /* 合計を求める */
-function sum(arr, fn) {
-  return arr.reduce((a, b, c) => {
-    return a + (Number(fn(b, c)) || 0);
+function sum(accounts, n, name) {
+  return accounts.reduce((sum, account, i) => {
+    var stat = account.data.statistics;
+    var value = 0;
+    if (stat.length > 0) {
+      if (stat.length > n) {
+        value = stat[n][name];
+      } else {
+        value = stat[stat.length - 1][name];
+      }
+    }
+    return sum + value;
   }, 0);
 }
 
@@ -29,41 +38,17 @@ exports.toData = function(_accounts, user) {
     tag: config.user.tag,
     url: exports.url(user.uid),
     now: {
-      fav: sum(
-        accounts,
-        a => a.data.statistics[0].favourites_count
-      ),
-      tweet: sum(
-        accounts,
-        a => a.data.statistics[0].statuses_count
-      ),
-      follow: sum(
-        accounts,
-        a => a.data.statistics[0].friends_count
-      ),
-      follower: sum(
-        accounts,
-        a => a.data.statistics[0].followers_count
-      ),
+      fav: sum(accounts, 0, 'favourites_count'),
+      tweet: sum(accounts, 0, 'statuses_count'),
+      follow: sum(accounts, 0, 'friends_count'),
+      follower: sum(accounts, 0, 'followers_count'),
       timestamp: accounts[0].data.last.timestamp
     },
     prev: {
-      fav: sum(
-        accounts,
-        a => a.data.statistics[1].favourites_count
-      ),
-      tweet: sum(
-        accounts,
-        a => a.data.statistics[1].statuses_count
-      ),
-      follow: sum(
-        accounts,
-        a => a.data.statistics[1].friends_count
-      ),
-      follower: sum(
-        accounts,
-        a => a.data.statistics[1].followers_count
-      ),
+      fav: sum(accounts, 1, 'favourites_count'),
+      tweet: sum(accounts, 1, 'statuses_count'),
+      follow: sum(accounts, 1, 'friends_count'),
+      follower: sum(accounts, 1, 'followers_count'),
       timestamp: accounts[0].data.last.timestamp - Date.aday
     }
   };

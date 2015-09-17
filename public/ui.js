@@ -1,4 +1,13 @@
+function hsv2rgb(h, s, v){
+  var i, f;
+  h = [v, v - (f = v * s * ((f = h / 60 % 6) - (i = f ^ 0))),
+    h = v - v * s, h, f + h, v];
+  var rgb = (h[i] << 16) | (h[(i + 4) % 6] << 8) | h[(i + 2) % 6];
+  return'#' + ('000000' + rgb.toString(16)).slice(-6);
+}
+
 google.load('visualization', '1', {'packages':['corechart']});
+
 $(function(){
   var dragging = null;
 
@@ -160,55 +169,87 @@ $(function(){
     }
   });
 
-  var graph = $('#accounts-graph .graph');
-  var chart;
-  var diffCheckbox = $('#accounts-graph .graph-diff').on('click', function(){
-    $('#accounts-graph > .nav-tabs > li.active > a').click();
-  });
-  $('#accounts-graph > .nav-tabs a').on('click', function(e){
-    e.preventDefault();
-    $(this).tab('show');
-    var len = 0;
-    var id = graph.data('id');
-    var adata = graph.data('data').map(function(a){
-      if (len < a.length) {
-        len = a.length;
-      }
-      return a.map(function(d){
-        return d ? d[$(this).attr('href').slice(1) + '_count'] : null;
-      }.bind(this))
-    }.bind(this));
-    var base = new Date(graph.data('date'));
-    if (diffCheckbox.prop('checked')) {
-      adata = adata.map(function(a){
-        var prev = a.shift();
-        return a.map(function(n){
-          var res = prev - n;
-          prev = n;
-          return res;
+  $('#accounts-graph').each(function(){
+    var graph = $('.graph', this);
+    graph.first().on('load', function(){
+      $('.nav-tabs a:first').trigger('click');
+    });
+    var date = new Date(graph.data('date'));
+    var column = [].concat.apply([], graph.data('id').map(function(c){
+      return [c, c];
+    }));
+    var src = graph.data('data');
+    $('.nav-tabs a').on('click', function(e){
+      e.preventDefault();
+      $(this).tab('show');
+      var name = $(this).attr('href').slice(1) + '_count';
+      var series = [];
+      var hue = Math.random() * 360 ^ 0;
+      var data = [].concat.apply([], src.map(function(a, i){
+        var total = a.map(function(d){ return d[name]; });
+        var diff = calcDifference(total);
+        series.push({
+          color: hsv2rgb((hue + i / src.length * 360) % 360, 0.3, 0xef),
+          visibleInLegend: false
+        }, {
+          color: hsv2rgb((hue + i / src.length * 360) % 360, 0.8, 0xcf),
+          type: 'line',
+          targetAxisIndex: 1,
         });
-      });
-      base -= 24 * 60 * 60 * 1000;
-    }
-    var data = [];
-    for (var i = 0; i < len; i++) {
-      data[i] = adata.map(function(a){ return a[i]; });
-      data[i].unshift(new Date(base - i * 24 * 60 * 60 * 1000));
-    }
-    data.unshift(['date']);
-    data[0].push.apply(data[0], id);
-    var options = {
-      legend: { position: 'bottom' },
-      hAxis: {
-        title: 'date',
-        titleTextStyle: { color: '#333' }
-      }
-    };
-    chart.draw(google.visualization.arrayToDataTable(data), options);
+        return [total, diff];
+      }.bind(this)));
+      data = createGraphData(date, column, data);
+      graph.trigger('draw', [data, {
+        isStacked: true,
+        legend: {
+          position: 'bottom'
+        },
+        hAxis: {
+          title: 'date',
+          titleTextStyle: { color: '#333' }
+        },
+        vAxis: { minValue: 0 },
+        opacity: 0.3,
+        seriesType: 'bars',
+        series: series
+      }]);
+    });
   });
-  google.setOnLoadCallback(function(){
-    chart = new google.visualization.LineChart(graph.get(0));
-    graph.data('chart', chart);
-    $('#accounts-graph > .nav-tabs li.active a').click();
+
+  $('#account-graph').each(function(){
+    var graph = $('.graph', this);
+    graph.first().on('load', function(){
+      $('.nav-tabs a:first').trigger('click');
+    });
+    var date = new Date(graph.data('date'));
+    var column = ['total', 'difference'];
+    var src = graph.data('data');
+    $('.nav-tabs a').on('click', function(e){
+      e.preventDefault();
+      $(this).tab('show');
+      var name = $(this).attr('href').slice(1) + '_count';
+      var data = src.map(function(a){ return a[name]; });
+      var hue = Math.random() * 360 ^ 0;
+      data = createGraphData(date, column, [data, calcDifference(data)]);
+      graph.trigger('draw', [data, {
+        legend: {
+          position: 'bottom'
+        },
+        hAxis: {
+          title: 'date',
+          titleTextStyle: { color: '#333' }
+        },
+        vAxis: { minValue: 0 },
+        seriesType: 'bars',
+        series: [
+          { color: hsv2rgb(hue, 0.3, 0xef) },
+          {
+            color: hsv2rgb(hue, 0.8, 0xcf),
+            targetAxisIndex: 1,
+            type: 'line'
+          }
+        ]
+      }]);
+    });
   });
 });

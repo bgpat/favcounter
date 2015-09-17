@@ -145,7 +145,6 @@ app.get('/user/:uid/:date', (req, res, next) => {
           return next(new Error('このページは存在しません'));
         }
         var site = '@' + accounts[0].data.recent.screen_name;
-        var title = 0;
         var data = tweet.toData(accounts, user);
         res.render('user', {
           error: null,
@@ -155,10 +154,8 @@ app.get('/user/:uid/:date', (req, res, next) => {
           date: date.time,
           card: {
             site: site,
-            title: [
-              date.prevDay().toString('YYYY/MM/DD'),
-              site,
-              '記録'].join('の'),
+            title: date.prevDay().toString('YYYY/MM/DD')
+            + ' の ' + accounts[0].data.recent.name + ' さんの記録',
             description: [
               ['ふぁぼ', 'fav'],
               ['ツイート', 'tweet'],
@@ -183,8 +180,46 @@ app.get('/user/:uid/:date', (req, res, next) => {
 });
 
 app.get('/account/:id', (req, res, next) => {
+  var path = '/account/' + req.params.id + '/';
+  res.redirect(path + Date.today.toString('YYYYMMDD'));
+});
+
+app.get('/account/:id/:date', (req, res, next) => {
+  var d = req.params.date.match(/(\d{4})([01]\d)([0-3]\d)/);
+  if (d == null) {
+    return next(new Error('このページは存在しません'));
+  }
+  var date = Date.today;
+  date.year = d[1];
+  date.month = d[2];
+  date.date = d[3];
+  if (Date.now.time < date.time) {
+    return next(new Error('このページは存在しません'));
+  }
   Account(req.params.id, (err, account) => {
-    res.json(account.data.statistics);
+    account.data.base = date.nextDay().time - 1;
+    if (account.data.recent == null) {
+      return next(new Error('このページは存在しません'));
+    }
+    var site = '@' + account.data.recent.screen_name;
+    return res.render('account', {
+      error: null,
+      session: req.session,
+      user: null,
+      account: account,
+      date: date.time,
+      card: {
+        site: site,
+        title: 'ふぁぼかうんたー',
+        description: 'テスト中'
+      }
+    });
+    /*
+     res.json(account.data.statistics.map(d => {
+       d.date = (new Date(d.timestamp)).toString('YYYY/MM/DD hh:mm:ss');
+       return d;
+     }));
+     */
   });
 });
 

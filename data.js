@@ -24,7 +24,6 @@ module.exports = function(proto) {
         }
         return d;
       }, null);
-      arr.push({});
       return arr;
     }},
     toJSON: {value: () => [].slice.call(this, 0)}

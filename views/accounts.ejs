@@ -15,7 +15,8 @@
 <% var fav = 0, tweet = 0, follow = 0, follower = 0; %>
 <% for (var i = 0; i < accounts.length; i++) { %>
 <% var account = accounts[i]; %>
-<% var data = account.data[0]; %>
+<% var data = account.data.statistics[0] || {}; %>
+<% var recent = account.data.recent; %>
 <tr class="account draggable-item" data-id="<%= account.id %>">
 <% if (accounts === session.accounts) { %>
 <td class="account-grip">
@@ -24,20 +25,20 @@
 <% } else { %>
 <td></td>
 <% } %>
-<td title="<%= data.name %>">
+<td title="<%= recent.name %>">
 <a href="/account/<%= account.id %>">
-<span class="icon"><img src ="<%= data.profile_image_url_https %>" /></span>
-<%= data.screen_name %>
+<span class="icon"><img src ="<%= recent.profile_image_url_https %>" /></span>
+<%= recent.screen_name %>
 </a>
 </td>
-<td><%= data.favourites_count %></td>
-<td><%= data.statuses_count %></td>
-<td><%= data.friends_count %></td>
-<td><%= data.followers_count %></td>
-<% fav += data.favourites_count %>
-<% tweet += data.statuses_count %>
-<% follow += data.friends_count %>
-<% follower += data.followers_count %>
+<td><%= data.favourites_count || 0 %></td>
+<td><%= data.statuses_count || 0 %></td>
+<td><%= data.friends_count || 0 %></td>
+<td><%= data.followers_count || 0 %></td>
+<% fav += data.favourites_count || 0 %>
+<% tweet += data.statuses_count || 0 %>
+<% follow += data.friends_count || 0 %>
+<% follower += data.followers_count || 0 %>
 </tr>
 <% } %>
 </tbody>
@@ -59,9 +60,5 @@
 <li><a href="#friends">follow</a></li>
 <li><a href="#followers">follower</a></li>
 </ul>
-<label class="checkbox-inline">
-<input type="checkbox" class="graph-diff" checked="checked" />
-増分を表示
-</label>
 <div class="graph" data-id="<%= JSON.stringify(accounts.map(a => a.data[0].screen_name)) %>" data-data="<%= JSON.stringify(accounts.map(a => a.data.statistics)) %>" data-date="<%= date %>"></div>
 </div>
