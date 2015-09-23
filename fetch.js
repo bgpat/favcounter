@@ -1,7 +1,6 @@
 var Twitter = require('./twitter');
 var Account = require('./account');
 var User = require('./user');
-var db = require('./db');
 var Date = require('./date').Date;
 
 var fetch = function(cb, soon) {
@@ -21,7 +20,9 @@ var fetch = function(cb, soon) {
         data.forEach(d => {
           Account(d.id_str, (err, a) => {
             if (err) {
-              len--;
+              if (--len === 0) {
+                cb();
+              }
               return console.error(err);
             }
             a.addData(d);
