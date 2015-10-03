@@ -169,6 +169,24 @@ $(function(){
     }
   });
 
+  $('.remove-account').on('click', function(e){
+    if (confirm('本当に削除してもよろしいですか？')) {
+      $.ajax({
+        type: 'POST',
+        url: '/remove',
+        data: JSON.stringify({
+          id: $(this).data('id')
+        }),
+        contentType: 'application/json',
+        dataType: 'json',
+        success: function(data){
+          alert('アカウントを削除しました');
+          location.href = '/';
+        }
+      });
+    }
+  });
+
   $('#accounts-graph').each(function(){
     var graph = $('.graph', this);
     graph.first().on('load', function(){
@@ -196,60 +214,60 @@ $(function(){
           type: 'line',
           targetAxisIndex: 1,
         });
-        return [total, diff];
-      }.bind(this)));
-      data = createGraphData(date, column, data);
-      graph.trigger('draw', [data, {
-        isStacked: true,
-        legend: {
-          position: 'bottom'
-        },
-        hAxis: {
-          title: 'date',
-          titleTextStyle: { color: '#333' }
-        },
-        vAxis: { minValue: 0 },
-        opacity: 0.3,
-        seriesType: 'bars',
-        series: series
-      }]);
+          return [total, diff];
+        }.bind(this)));
+        data = createGraphData(date, column, data);
+        graph.trigger('draw', [data, {
+          isStacked: true,
+          legend: {
+            position: 'bottom'
+          },
+          hAxis: {
+            title: 'date',
+            titleTextStyle: { color: '#333' }
+          },
+          vAxis: { minValue: 0 },
+          opacity: 0.3,
+          seriesType: 'bars',
+          series: series
+        }]);
+      });
     });
-  });
 
-  $('#account-graph').each(function(){
-    var graph = $('.graph', this);
-    graph.first().on('load', function(){
-      $('.nav-tabs a:first').trigger('click');
-    });
-    var date = new Date(graph.data('date'));
-    var column = ['total', 'difference'];
-    var src = graph.data('data');
-    $('.nav-tabs a').on('click', function(e){
-      e.preventDefault();
-      $(this).tab('show');
-      var name = $(this).attr('href').slice(1) + '_count';
-      var data = src.map(function(a){ return a[name]; });
-      var hue = Math.random() * 360 ^ 0;
-      data = createGraphData(date, column, [data, calcDifference(data)]);
-      graph.trigger('draw', [data, {
-        legend: {
-          position: 'bottom'
-        },
-        hAxis: {
-          title: 'date',
-          titleTextStyle: { color: '#333' }
-        },
-        vAxis: { minValue: 0 },
-        seriesType: 'bars',
-        series: [
-          { color: hsv2rgb(hue, 0.3, 0xef) },
-          {
-            color: hsv2rgb(hue, 0.8, 0xcf),
-            targetAxisIndex: 1,
-            type: 'line'
-          }
-        ]
-      }]);
+    $('#account-graph').each(function(){
+      var graph = $('.graph', this);
+      graph.first().on('load', function(){
+        $('.nav-tabs a:first').trigger('click');
+      });
+      var date = new Date(graph.data('date'));
+      var column = ['total', 'difference'];
+      var src = graph.data('data');
+      $('.nav-tabs a').on('click', function(e){
+        e.preventDefault();
+        $(this).tab('show');
+        var name = $(this).attr('href').slice(1) + '_count';
+        var data = src.map(function(a){ return a[name]; });
+        var hue = Math.random() * 360 ^ 0;
+        data = createGraphData(date, column, [data, calcDifference(data)]);
+        graph.trigger('draw', [data, {
+          legend: {
+            position: 'bottom'
+          },
+          hAxis: {
+            title: 'date',
+            titleTextStyle: { color: '#333' }
+          },
+          vAxis: { minValue: 0 },
+          seriesType: 'bars',
+          series: [
+            { color: hsv2rgb(hue, 0.3, 0xef) },
+            {
+              color: hsv2rgb(hue, 0.8, 0xcf),
+              targetAxisIndex: 1,
+              type: 'line'
+            }
+          ]
+        }]);
+      });
     });
   });
-});

@@ -1,6 +1,9 @@
 <% include header %>
 <div>
 <h2><%= account.data.recent.screen_name%> のTwitter活動記録</h2>
+<button class="remove-account btn btn-danger" data-id="<%= account.data.recent.id_str %>">
+@<%= account.data.recent.screen_name %> をふぁぼかうんたーから削除
+</button>
 <div id="account-graph">
 <ul class="nav nav-tabs">
 <li class="active"><a href="#favourites">fav</a></li>
