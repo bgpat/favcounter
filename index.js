@@ -8,6 +8,7 @@ var ejs = require('ejs');
 var bodyParser = require('body-parser');
 var expressSession = require('express-session');
 var MemcachedStore = require('connect-memcached')(expressSession);
+var logger = require('morgan');
 var Twitter = require('./twitter');
 var Account = require('./account');
 var User = require('./user');
@@ -19,6 +20,7 @@ var config = require('./config');
 /* config */
 var app = express();
 app.disable('x-powered-by');
+app.use(logger('dev'));
 app.set('view engine', 'ejs');
 app.set('views', __dirname + '/views');
 app.use(express.static(__dirname + '/public'));
@@ -365,3 +367,8 @@ app.use('*', (err, req, res, next) => {
 
 /* listen */
 app.listen(config.server.socket);
+
+/* error handling */
+process.on('uncaughtException', err => {
+  console.error(err);
+});
